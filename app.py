@@ -12,11 +12,9 @@ st.set_page_config(
 
 st.title("🔬 Gram Stain AI Classifier")
 
-st.write("Upload microscope image to classify Gram Positive or Gram Negative bacteria.")
-
 uploaded_file = st.file_uploader(
-    "Upload Image",
-    type=["jpg", "jpeg", "png"]
+    "Upload microscope image",
+    type=["jpg","jpeg","png"]
 )
 
 if uploaded_file:
@@ -29,21 +27,25 @@ if uploaded_file:
         use_container_width=True
     )
 
-    img = image.resize((224,224))
-    img = np.array(img) / 255.0
-    img = np.expand_dims(img, axis=0)
+    if st.button("🔬 Predict"):
 
-    prediction = model.predict(img)[0][0]
+        img = image.convert("RGB")
+        img = img.resize((224,224))
 
-    if prediction > 0.5:
-        result = "Gram Negative"
-        confidence = prediction * 100
-    else:
-        result = "Gram Positive"
-        confidence = (1-prediction) * 100
+        img = np.array(img)
+        img = img / 255.0
+        img = np.expand_dims(img, axis=0)
 
-    st.success(f"Result: {result}")
-    st.info(f"Confidence: {confidence:.2f}%")
+        prediction = model.predict(img)
 
-st.markdown("---")
-st.write("Developed by Hasnan | Gram Stain AI Project")
+        score = prediction[0][0]
+
+        if score > 0.5:
+            result = "Gram Negative"
+            confidence = score * 100
+        else:
+            result = "Gram Positive"
+            confidence = (1-score) * 100
+
+        st.success(f"Result: {result}")
+        st.info(f"Confidence: {confidence:.2f}%")
