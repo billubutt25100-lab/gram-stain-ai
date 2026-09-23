@@ -1,62 +1,49 @@
-
-import gradio as gr
+import streamlit as st
 import tensorflow as tf
 import numpy as np
+from PIL import Image
 
 model = tf.keras.models.load_model("gram_stain_model.h5")
 
+st.set_page_config(
+    page_title="Gram Stain AI",
+    page_icon="🔬"
+)
 
-def predict(image):
+st.title("🔬 Gram Stain AI Classifier")
 
-    image = image.resize((224,224))
+st.write("Upload microscope image to classify Gram Positive or Gram Negative bacteria.")
 
-    img = np.array(image) / 255.0
+uploaded_file = st.file_uploader(
+    "Upload Image",
+    type=["jpg", "jpeg", "png"]
+)
+
+if uploaded_file:
+
+    image = Image.open(uploaded_file)
+
+    st.image(
+        image,
+        caption="Uploaded Image",
+        use_container_width=True
+    )
+
+    img = image.resize((224,224))
+    img = np.array(img) / 255.0
     img = np.expand_dims(img, axis=0)
 
     prediction = model.predict(img)[0][0]
 
     if prediction > 0.5:
-        result = "🦠 Gram Negative"
+        result = "Gram Negative"
         confidence = prediction * 100
     else:
-        result = "🧫 Gram Positive"
+        result = "Gram Positive"
         confidence = (1-prediction) * 100
 
-    return result, f"Confidence: {confidence:.2f}%"
+    st.success(f"Result: {result}")
+    st.info(f"Confidence: {confidence:.2f}%")
 
-
-with gr.Blocks(theme=gr.themes.Base()) as app:
-
-    gr.Markdown(
-    """
-    # 🧬 Gram Stain AI Classifier
-
-    Upload a Gram stain microscope image.
-    """
-    )
-
-    image = gr.Image(type="pil", label="Upload Image")
-
-    btn = gr.Button("🔬 Predict")
-
-    result = gr.Textbox(label="Result")
-
-    confidence = gr.Textbox(label="Confidence")
-
-
-    btn.click(
-        predict,
-        inputs=image,
-        outputs=[result, confidence]
-    )
-
-
-    gr.Markdown(
-    """
-    ---
-    **Developed by Hasnan**
-    """
-    )
-
-
-app.launch()
+st.markdown("---")
+st.write("Developed by Hasnan | Gram Stain AI Project")
