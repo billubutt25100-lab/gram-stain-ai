@@ -49,3 +49,18 @@ if uploaded_file:
 
         st.success(f"Result: {result}")
         st.info(f"Confidence: {confidence:.2f}%")
+st.markdown("---")
+
+st.subheader("📌 Project Information")
+
+st.write("""
+**Model:** Deep Learning CNN Model
+
+**Task:** Gram Positive vs Gram Negative Classification
+
+**Input:** Microscope Gram Stain Images
+
+**Output:** Predicted Bacterial Class with Confidence Score
+
+**Developed by:** Hasnan
+""")
